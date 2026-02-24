@@ -42,64 +42,53 @@ export default function KexPosLoginWithCountdown() {
   };
 
   return (
-    <div className="w-full h-screen bg-white flex items-center justify-center font-sans relative">
-      <div className="w-[440px]">
-        <div className="border-4 border-orange-500 text-orange-500 px-8 py-2 text-3xl font-bold tracking-widest text-center mb-8">
-          KEX
-        </div>
+    <div style={styles.wrapper}>
+      <div style={styles.container}>
+        <div style={styles.logo}>KEX</div>
 
         {status === "COUNTDOWN" && (
-          <div className="border border-orange-400 bg-orange-50 text-orange-700 p-4 mb-5 text-sm">
-            <div className="font-semibold mb-1">Remittance Overdue Notice</div>
+          <div style={styles.notice}>
+            <div style={{ fontWeight: "bold", marginBottom: 6 }}>
+              Remittance Overdue Notice
+            </div>
             <div>Overdue Days: {overdueDays}</div>
             <div>Outstanding: {outstandingAmount}</div>
-            <div className="mt-2">
+            <div style={{ marginTop: 10 }}>
               Lock in:
-              <div className="text-lg font-bold mt-1">
-                {formatTime(remaining)}
-              </div>
+              <div style={styles.timer}>{formatTime(remaining)}</div>
             </div>
           </div>
         )}
 
-        <div className="mb-4">
-          <div className="text-gray-700 mb-1">User:</div>
-          <input
-            className="w-full border-b border-gray-400 outline-none px-2 py-1"
-            defaultValue="junuatpos03"
-          />
+        <div style={styles.field}>
+          <label>User:</label>
+          <input style={styles.input} defaultValue="junuatpos03" />
         </div>
 
-        <div className="mb-6">
-          <div className="text-gray-700 mb-1">Password:</div>
-          <input
-            type="password"
-            className="w-full border-b border-gray-400 outline-none px-2 py-1"
-          />
+        <div style={styles.field}>
+          <label>Password:</label>
+          <input type="password" style={styles.input} />
         </div>
 
-        <button
-          onClick={handleLogin}
-          className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white font-semibold"
-        >
+        <button style={styles.button} onClick={handleLogin}>
           Login
         </button>
       </div>
 
       {showModal && (
-        <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-          <div className="bg-white w-[360px] p-6 border border-red-500">
-            <div className="text-red-600 font-semibold text-lg mb-3">
+        <div style={styles.modalOverlay}>
+          <div style={styles.modal}>
+            <h3 style={{ color: "red", marginTop: 0 }}>
               Payment Required
-            </div>
-            <div className="text-sm">Outstanding: {outstandingAmount}</div>
-            <div className="text-sm">Overdue Days: {overdueDays}</div>
-            <div className="mt-4 text-sm">
+            </h3>
+            <p>Outstanding: {outstandingAmount}</p>
+            <p>Overdue Days: {overdueDays}</p>
+            <p>
               POS login is restricted until payment is confirmed by Finance.
-            </div>
+            </p>
             <button
+              style={{ ...styles.button, backgroundColor: "red" }}
               onClick={() => setShowModal(false)}
-              className="mt-6 w-full py-2 bg-red-500 text-white font-semibold"
             >
               Confirm
             </button>
@@ -110,3 +99,77 @@ export default function KexPosLoginWithCountdown() {
   );
 }
 
+const styles: { [key: string]: React.CSSProperties } = {
+  wrapper: {
+    width: "100%",
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontFamily: "Arial, sans-serif",
+    backgroundColor: "#ffffff",
+  },
+  container: {
+    width: 420,
+  },
+  logo: {
+    border: "4px solid #f97316",
+    color: "#f97316",
+    padding: "8px 0",
+    textAlign: "center",
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 30,
+    letterSpacing: 4,
+  },
+  notice: {
+    border: "1px solid orange",
+    backgroundColor: "#fff7ed",
+    padding: 15,
+    marginBottom: 20,
+    fontSize: 14,
+  },
+  timer: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginTop: 4,
+  },
+  field: {
+    display: "flex",
+    flexDirection: "column",
+    marginBottom: 16,
+    fontSize: 14,
+  },
+  input: {
+    padding: 6,
+    border: "none",
+    borderBottom: "1px solid #999",
+    outline: "none",
+  },
+  button: {
+    width: "100%",
+    padding: "10px 0",
+    backgroundColor: "#f97316",
+    color: "white",
+    fontWeight: "bold",
+    border: "none",
+    cursor: "pointer",
+  },
+  modalOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modal: {
+    backgroundColor: "white",
+    padding: 24,
+    width: 360,
+    border: "1px solid red",
+  },
+};
