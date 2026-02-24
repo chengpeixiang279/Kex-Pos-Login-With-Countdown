@@ -1,173 +1,218 @@
-import React, { useEffect, useState } from "react";
-
-export default function KexPosLoginWithCountdown() {
-  const [status, setStatus] = useState<"NORMAL" | "COUNTDOWN" | "LOCKED">("COUNTDOWN");
-  const [remaining, setRemaining] = useState<number>(7200);
-  const [showModal, setShowModal] = useState<boolean>(false);
-
-  const overdueDays = 3;
-  const outstandingAmount = "12,450 THB";
-
-  useEffect(() => {
-    if (status !== "COUNTDOWN") return;
-
-    const interval = setInterval(() => {
-      setRemaining((prev) => {
-        if (prev <= 1) {
-          clearInterval(interval);
-          setStatus("LOCKED");
-          setShowModal(true);
-          return 0;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEX POS Login with Countdown</title>
+    <style>
+        /* 全局样式，对应 React 中的 styles 对象 */
+        .wrapper {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
         }
-        return prev - 1;
-      });
-    }, 1000);
 
-    return () => clearInterval(interval);
-  }, [status]);
+        .container {
+            width: 420px;
+        }
 
-  const formatTime = (seconds: number) => {
-    const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
-    const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
-    const s = String(seconds % 60).padStart(2, "0");
-    return `${h}:${m}:${s}`;
-  };
+        .logo {
+            border: 4px solid #f97316;
+            color: #f97316;
+            padding: 8px 0;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            letter-spacing: 4px;
+        }
 
-  const handleLogin = () => {
-    if (status !== "NORMAL") {
-      setShowModal(true);
-      return;
-    }
-    alert("Login Success (Demo)");
-  };
+        .notice {
+            border: 1px solid orange;
+            background-color: #fff7ed;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
 
-  return (
-    <div style={styles.wrapper}>
-      <div style={styles.container}>
-        <div style={styles.logo}>KEX</div>
+        .timer {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 4px;
+        }
 
-        {status === "COUNTDOWN" && (
-          <div style={styles.notice}>
-            <div style={{ fontWeight: "bold", marginBottom: 6 }}>
-              Remittance Overdue Notice
+        .field {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .input {
+            padding: 6px;
+            border: none;
+            border-bottom: 1px solid #999;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .button {
+            width: 100%;
+            padding: 10px 0;
+            background-color: #f97316;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            display: none; /* 默认隐藏弹窗 */
+        }
+
+        .modal {
+            background-color: white;
+            padding: 24px;
+            width: 360px;
+            border: 1px solid red;
+        }
+
+        .modal .button {
+            background-color: red;
+            margin-top: 20px;
+        }
+
+        .modal h3 {
+            color: red;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <div class="logo">KEX</div>
+
+            <!-- 逾期提醒区域 -->
+            <div id="notice" class="notice">
+                <div style="font-weight: bold; margin-bottom: 6px;">Remittance Overdue Notice</div>
+                <div>Overdue Days: <span id="overdue-days">3</span></div>
+                <div>Outstanding: <span id="outstanding-amount">12,450 THB</span></div>
+                <div style="margin-top: 10px;">
+                    Lock in:
+                    <div id="timer" class="timer">02:00:00</div>
+                </div>
             </div>
-            <div>Overdue Days: {overdueDays}</div>
-            <div>Outstanding: {outstandingAmount}</div>
-            <div style={{ marginTop: 10 }}>
-              Lock in:
-              <div style={styles.timer}>{formatTime(remaining)}</div>
+
+            <!-- 登录表单 -->
+            <div class="field">
+                <label>User:</label>
+                <input id="username" class="input" type="text" value="junuatpos03">
             </div>
-          </div>
-        )}
 
-        <div style={styles.field}>
-          <label>User:</label>
-          <input style={styles.input} defaultValue="junuatpos03" />
+            <div class="field">
+                <label>Password:</label>
+                <input id="password" class="input" type="password">
+            </div>
+
+            <button id="login-btn" class="button">Login</button>
         </div>
-
-        <div style={styles.field}>
-          <label>Password:</label>
-          <input type="password" style={styles.input} />
-        </div>
-
-        <button style={styles.button} onClick={handleLogin}>
-          Login
-        </button>
-      </div>
-
-      {showModal && (
-        <div style={styles.modalOverlay}>
-          <div style={styles.modal}>
-            <h3 style={{ color: "red", marginTop: 0 }}>Payment Required</h3>
-            <p>Outstanding: {outstandingAmount}</p>
-            <p>Overdue Days: {overdueDays}</p>
-            <p>
-              POS login is restricted until payment is confirmed by Finance.
-            </p>
-            <button
-              style={{ ...styles.button, backgroundColor: "red" }}
-              onClick={() => setShowModal(false)}
-            >
-              Confirm
-            </button>
-          </div>
-        </div>
-      )}
     </div>
-  );
-}
 
-const styles: Record<string, React.CSSProperties> = {
-  wrapper: {
-    width: "100%",
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    fontFamily: "Arial, sans-serif",
-    backgroundColor: "#ffffff",
-  },
-  container: {
-    width: 420,
-  },
-  logo: {
-    border: "4px solid #f97316",
-    color: "#f97316",
-    padding: "8px 0",
-    textAlign: "center",
-    fontSize: 28,
-    fontWeight: "bold",
-    marginBottom: 30,
-    letterSpacing: 4,
-  },
-  notice: {
-    border: "1px solid orange",
-    backgroundColor: "#fff7ed",
-    padding: 15,
-    marginBottom: 20,
-    fontSize: 14,
-  },
-  timer: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginTop: 4,
-  },
-  field: {
-    display: "flex",
-    flexDirection: "column",
-    marginBottom: 16,
-    fontSize: 14,
-  },
-  input: {
-    padding: 6,
-    border: "none",
-    borderBottom: "1px solid #999",
-    outline: "none",
-  },
-  button: {
-    width: "100%",
-    padding: "10px 0",
-    backgroundColor: "#f97316",
-    color: "white",
-    fontWeight: "bold",
-    border: "none",
-    cursor: "pointer",
-  },
-  modalOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modal: {
-    backgroundColor: "white",
-    padding: 24,
-    width: 360,
-    border: "1px solid red",
-  },
-};
+    <!-- 提示弹窗 -->
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <h3>Payment Required</h3>
+            <p>Outstanding: <span id="modal-outstanding">12,450 THB</span></p>
+            <p>Overdue Days: <span id="modal-overdue">3</span></p>
+            <p>
+                POS login is restricted until payment is confirmed by Finance.
+            </p>
+            <button id="confirm-btn" class="button">Confirm</button>
+        </div>
+    </div>
+
+    <script>
+        // 定义状态和常量
+        let status = "COUNTDOWN"; // NORMAL / COUNTDOWN / LOCKED
+        let remaining = 7200; // 初始剩余秒数（2小时）
+        const overdueDays = 3;
+        const outstandingAmount = "12,450 THB";
+
+        // 获取DOM元素
+        const noticeEl = document.getElementById("notice");
+        const timerEl = document.getElementById("timer");
+        const loginBtn = document.getElementById("login-btn");
+        const modalOverlay = document.getElementById("modal-overlay");
+        const confirmBtn = document.getElementById("confirm-btn");
+
+        // 格式化秒数为 HH:MM:SS
+        function formatTime(seconds) {
+            const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
+            const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
+            const s = String(seconds % 60).padStart(2, "0");
+            return `${h}:${m}:${s}`;
+        }
+
+        // 倒计时逻辑
+        let interval;
+        if (status === "COUNTDOWN") {
+            interval = setInterval(() => {
+                if (remaining <= 1) {
+                    clearInterval(interval);
+                    status = "LOCKED";
+                    showModal();
+                    remaining = 0;
+                    timerEl.textContent = formatTime(remaining);
+                    return;
+                }
+                remaining -= 1;
+                timerEl.textContent = formatTime(remaining);
+            }, 1000);
+        }
+
+        // 显示弹窗
+        function showModal() {
+            modalOverlay.style.display = "flex";
+        }
+
+        // 隐藏弹窗
+        function hideModal() {
+            modalOverlay.style.display = "none";
+        }
+
+        // 登录按钮点击事件
+        loginBtn.addEventListener("click", () => {
+            if (status !== "NORMAL") {
+                showModal();
+                return;
+            }
+            alert("Login Success (Demo)");
+        });
+
+        // 弹窗确认按钮点击事件
+        confirmBtn.addEventListener("click", hideModal);
+
+        // 页面卸载时清除定时器（防止内存泄漏）
+        window.addEventListener("beforeunload", () => {
+            clearInterval(interval);
+        });
+    </script>
+</body>
+</html>
